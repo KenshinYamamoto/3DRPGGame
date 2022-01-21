@@ -9,6 +9,7 @@ public class PlayerGetHitBehaviour : StateMachineBehaviour
     {
         // ‘¬“x‚ð0‚É‚µ‚½‚¢
         animator.GetComponent<PlayerManager>().moveSpeed = 0.5f;
+        animator.GetComponent<PlayerManager>().HideClliderWeapon();
         animator.ResetTrigger("Hurt");
     }
 

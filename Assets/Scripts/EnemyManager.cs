@@ -16,9 +16,14 @@ public class EnemyManager : MonoBehaviour
     Animator animator;
     public Collider weaponCollider;
     public Transform target;
+    [SerializeField] EnemyUIManager enemyUIManager;
+    public int maxHp = 100;
+    int hp;
 
     void Start()
     {
+        hp = maxHp;
+        enemyUIManager.Init(this);
         // Playerを追跡するコードの実装
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -33,6 +38,11 @@ public class EnemyManager : MonoBehaviour
         animator.SetFloat("Distance", agent.remainingDistance);
     }
 
+    public void LookAtTarget()
+    {
+        transform.LookAt(target);
+    }
+
     // 武器の判定を有効にしたり無効にしたりする
     public void ShowClliderWeapon()
     {
@@ -41,6 +51,26 @@ public class EnemyManager : MonoBehaviour
     public void HideClliderWeapon()
     {
         weaponCollider.enabled = false;
+    }
+
+    void Damage(int damage)
+    {
+        hp -= damage;
+
+        if (hp <= 0)
+        {
+            GameClear();
+        }
+        enemyUIManager.UpdateUI(hp);
+        Debug.Log("Enemyhp:" + hp);
+    }
+
+    void GameClear()
+    {
+        hp = 0;
+        animator.SetTrigger("Die");
+        Destroy(gameObject, 2f);
+        GameObserver.gameObserver.ShowGameClearText();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -52,6 +82,7 @@ public class EnemyManager : MonoBehaviour
             // ぶつかった対象がDamageManagerを持っていたら
             Debug.Log("敵はダメージを受ける");
             animator.SetTrigger("Hurt");
+            Damage(danageManager.damage);
         }
     }
 }
